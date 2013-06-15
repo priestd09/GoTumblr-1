@@ -29,7 +29,6 @@ func (self *TumblrImg) GetUrl() string{
     switch(self.state){
     case OriginalResolution:
         url = self.url
-        break
     default:
         url = strings.Replace(self.url, self.rss_img_size, "_1280", -1)
     }
@@ -164,6 +163,14 @@ func (self *TumblrDownloader) Start(){
         if !ok {
             break
         }
-        go Download_raw(img_resource, *self)
+        go Download_raw(img_resource, self)
     }
+}
+
+func (self *TumblrDownloader) GetContentChan() chan Content{
+    return self.ContenChan
+}
+
+func (self *TumblrDownloader) GetUrlChan() chan ImgResource{
+    return self.UrlChan
 }

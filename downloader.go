@@ -13,6 +13,11 @@ type Downloader interface{
     Download(url string) []byte
 }
 
+type SiteDownloader interface{
+    GetContentChan() chan Content
+    GetUrlChan() chan ImgResource
+}
+
 type ImgResource interface{
     GetUrl() string
 }
@@ -48,7 +53,7 @@ func DirectDownloaderFactory() Downloader{
     return downloader
 }
 
-func Download_raw(img_resource ImgResource, td TumblrDownloader){
+func Download_raw(img_resource ImgResource, st SiteDownloader){
     worker := *(<-DownloadWorker)
     defer func(){
         DownloadWorker <- &worker
@@ -59,8 +64,8 @@ func Download_raw(img_resource ImgResource, td TumblrDownloader){
             Content:content,
             Resource:img_resource,
         }
-        td.ContenChan <- result
+        st.GetContentChan() <- result
     }else{
-        td.UrlChan <- img_resource
+        st.GetUrlChan() <- img_resource
     }
 }
