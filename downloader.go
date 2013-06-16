@@ -69,3 +69,11 @@ func Download_raw(img_resource ImgResource, st SiteDownloader){
         st.GetUrlChan() <- img_resource
     }
 }
+
+func Download(url string) []byte{
+    p_downloader := *(<- DownloadWorker)
+    defer func(){
+        DownloadWorker <- &p_downloader
+    }()
+    return p_downloader.Download(url)
+}

@@ -30,6 +30,7 @@ type config_struct struct{
     UseProxy bool
     TumblrSources []TumblrSource
     Timeout int64
+    Verbos bool
 }
 
 var Config config_struct

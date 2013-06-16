@@ -1,4 +1,5 @@
 {
+    "Verbos": false,
     "Proxy":"http://127.0.0.1:8087",
     "CheckInterval": 1,
     "Recorder": "sqlite",

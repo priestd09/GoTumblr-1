@@ -2,7 +2,6 @@ package main
 
 import(
     "os"
-    "log"
     "io/ioutil"
     "path"
     "strings"
@@ -65,7 +64,7 @@ func (self *TumblrDownloader) get_img_id(url string) (string, error){
     if len(matches) > 0{
         return matches[1], nil
     }
-    log.Printf("WARNING: Fail to Match id for %s", url)
+    Warn("WARNING: Fail to Match id for %s", url)
     return "", errors.New("Fail to Match Id: " + url)
 }
 
@@ -75,7 +74,7 @@ func (self *TumblrDownloader) AfterFinished(){
     _, err := os.Stat(dir)
     _, ok := err.(*os.PathError)
     if ok{
-        log.Printf("make dir : %s", dir)
+        Info("make dir : %s", dir)
         os.MkdirAll(dir, 0775)
     }
     for {
@@ -85,7 +84,7 @@ func (self *TumblrDownloader) AfterFinished(){
             filename := path.Base(content.Resource.GetUrl())
             filename = path.Join(dir, filename)
             if strings.Contains(string(content.Content), "AccessDenied"){
-                log.Printf("Access Denied Error, Try Use Original Link : %s", content.Resource.(*TumblrImg).url)
+                Error("Access Denied Error, Try Use Original Link : %s", content.Resource.(*TumblrImg).url)
                 self.AddUrl(&TumblrImg{
                     id:id,
                     url:content.Resource.(*TumblrImg).url,
@@ -95,7 +94,7 @@ func (self *TumblrDownloader) AfterFinished(){
             }else{
                 ioutil.WriteFile(filename, content.Content, 0600)
                 self.recorder.MarkAsFinished(id)
-                log.Printf("New Download Saved : %s", filename)
+                Info("New Download Saved : %s", filename)
             }
         }
     }
@@ -122,22 +121,16 @@ func (self *TumblrDownloader) ProcessUrl(url string){
             }
             self.AddUrl(&tumblr_img)
         }else{
-            //log.Printf("Already Downloaded : %s", id)
+            if Config.Verbos{
+                Info("Already Downloaded : %s", id)
+            }
         }
     }
 }
 
-func (self *TumblrDownloader) download_rss() string{
-    p_downloader := *(<- DownloadWorker)
-    defer func(){
-        DownloadWorker <- &p_downloader
-    }()
-    return string(p_downloader.Download(self.rss_addr))
-}
-
 func (self *TumblrDownloader) get_image_list() [][]string{
     finder, _ := regexp.Compile(`img *?src="(.*?)"`)
-    text := self.download_rss()
+    text := string(Download(self.rss_addr))
     rslts := finder.FindAllStringSubmatch(text, -1)
     return rslts
 }
@@ -145,8 +138,7 @@ func (self *TumblrDownloader) get_image_list() [][]string{
 func (self *TumblrDownloader) check_rss(){
     for {
         image_list := self.get_image_list()
-        log.Printf("Getting Rss %s: getted %d", self.rss_addr, len(image_list))
-        //len(rslts)
+        Info("Getting Rss %s: getted %d", self.rss_addr, len(image_list))
         for _, v := range image_list{
             url := v[1]
             go self.ProcessUrl(url)

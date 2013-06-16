@@ -11,6 +11,8 @@ func main(){
         td := MakeTumblrDownloader(tumblr_source.Name, tumblr_source.Suffix, tumblr_source.Url, recorder)
         go td.Start()
     }
+    kochan_downloader := MakeKochanDownloader(recorder)
+    go kochan_downloader.Start()
     a:=make(chan int)
     <-a
 }
