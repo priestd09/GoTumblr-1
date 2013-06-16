@@ -1,9 +1,9 @@
 {
-    "Verbos": false,
-    "Proxy":"http://127.0.0.1:8087",
+    "Verbos": true,
+    "Proxy":"http://10.8.0.1:8118/",
     "CheckInterval": 1,
     "Recorder": "sqlite",
-    "Timeout": 10,
+    "Timeout": 100,
     "UseProxy": true,
     "TumblrSources":[
         {"name": "arthuntermag", "suffix":"_500", "url":"http://www.arthuntermag.com/rss"}
